@@ -11,8 +11,6 @@ export default {
   jwt_refresh_expires_in: process.env.JWT_REFRESH_EXPIRES_IN,
   admin_email: process.env.ADMIN_EMAIL,
   admin_password: process.env.ADMIN_PASSWORD,
-  admin_mobile_number: process.env.ADMIN_MOBILE_NUMBER,
-  admin_image: process.env.ADMIN_IMAGE,
   reset_link_url: process.env.RESET_LINK_URL,
   bcrypt_salt_rounds: process.env.BCRYPT_SALT_ROUNDS,
 };
