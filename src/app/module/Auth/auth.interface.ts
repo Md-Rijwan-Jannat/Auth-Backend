@@ -1,12 +1,12 @@
 import { Document } from "mongoose";
 
 export enum UserRole {
-  ADMIN = "admin",
+  admin = "admin",
   USER = "user",
 }
 
 export enum UserStatus {
-  IN_PROGRESS = "in-progress",
+  in_progress = "in-progress",
   BLOCKED = "blocked",
 }
 

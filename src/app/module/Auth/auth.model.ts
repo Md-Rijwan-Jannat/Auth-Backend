@@ -39,7 +39,7 @@ const UserSchema = new Schema<IUser>(
     status: {
       type: String,
       enum: Object.values(UserStatus),
-      default: UserStatus.IN_PROGRESS,
+      default: UserStatus.in_progress,
     },
     bio: { type: String },
     profilePhoto: { type: String },
