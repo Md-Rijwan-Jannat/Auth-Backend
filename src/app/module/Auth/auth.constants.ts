@@ -1,9 +1,9 @@
 export const USER_ROLE = {
-  ADMIN: "admin",
-  USER: "user",
+  admin: "admin",
+  user: "user",
 } as const;
 
 export const USER_STATUS = {
-  IN_PROGRESS: "in-progress",
-  BLOCKED: "blocked",
+  in_progress: "in-progress",
+  blocked: "blocked",
 } as const;

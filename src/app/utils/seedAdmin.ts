@@ -14,7 +14,7 @@ const seedAdmin = async () => {
 
     const hashedPassword = await bcrypt.hash(
       config.admin_password as string,
-      Number(config.bcrypt_salt_rounds) || 10
+      10
     );
 
     await User.create({
