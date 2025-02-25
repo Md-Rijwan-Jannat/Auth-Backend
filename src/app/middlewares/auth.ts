@@ -22,10 +22,10 @@ const Auth = (...requiredRoles: (keyof typeof USER_ROLE)[]) => {
       config.jwt_access_secret as string
     ) as JwtPayload;
 
-    const { role, email, iat } = decoded;
+    const { role, id } = decoded;
 
     // checking if the user is exist
-    const user = await User.findOne({ email: email });
+    const user = await User.findById(id);
 
     if (!user) {
       throw new AppError(httpStatus.NOT_FOUND, "This user is not found !");
@@ -34,7 +34,7 @@ const Auth = (...requiredRoles: (keyof typeof USER_ROLE)[]) => {
 
     const status = user?.status;
 
-    if (status === USER_STATUS.BLOCKED) {
+    if (status === USER_STATUS.blocked) {
       throw new AppError(httpStatus.FORBIDDEN, "This user is blocked !");
     }
 

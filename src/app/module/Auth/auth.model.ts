@@ -1,26 +1,35 @@
 import { Schema, model } from "mongoose";
 import { IUser, UserRole, UserStatus } from "./auth.interface";
 import bcrypt from "bcrypt";
+import config from "../../../config";
 
 const UserSchema = new Schema<IUser>(
   {
     name: {
       type: String,
-      required: [true, "Name is required"],
-      trim: true,
+      required: true,
     },
     email: {
       type: String,
-      required: [true, "Email is required"],
       unique: true,
-      lowercase: true,
-      trim: true,
+      required: true,
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
-      minlength: 6,
-      select: false,
+      required: true,
+    },
+    age: {
+      type: Number,
+      required: true,
+    },
+    gender: {
+      type: String,
+      enum: ["male", "female", "non-binary"],
+      required: true,
+    },
+    location: {
+      type: String,
+      required: true,
     },
     role: {
       type: String,
@@ -30,8 +39,16 @@ const UserSchema = new Schema<IUser>(
     status: {
       type: String,
       enum: Object.values(UserStatus),
-      default: UserStatus.IN_PROGRESS,
+      default: UserStatus.in_progress,
     },
+    bio: { type: String },
+    profilePhoto: { type: String },
+    interests: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Interest",
+      },
+    ],
   },
   { timestamps: true }
 );
@@ -39,8 +56,7 @@ const UserSchema = new Schema<IUser>(
 // Hash password before saving
 UserSchema.pre<IUser>("save", async function (next) {
   if (!this.isModified("password")) return next();
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+  this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 
