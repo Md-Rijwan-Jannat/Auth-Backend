@@ -22,27 +22,11 @@ router.post(
   Auth(USER_ROLE.admin, USER_ROLE.user),
   AuthController.logout
 );
-router.get(
-  "/me",
-  Auth(USER_ROLE.admin, USER_ROLE.user),
-  AuthController.getCurrentUser
-);
-router.put(
-  "/update-profile",
-  Auth(USER_ROLE.admin, USER_ROLE.user),
-  validateRequest(AuthValidation.updateProfile),
-  AuthController.updateProfile
-);
 router.put(
   "/update-password",
   Auth(USER_ROLE.admin, USER_ROLE.user),
   validateRequest(AuthValidation.changePassword),
   AuthController.updatePassword
-);
-router.delete(
-  "/delete-account",
-  Auth(USER_ROLE.admin, USER_ROLE.user),
-  AuthController.deleteAccount
 );
 
 export const AuthRoutes = router;

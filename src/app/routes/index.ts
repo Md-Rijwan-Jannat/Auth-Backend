@@ -7,6 +7,7 @@ import { BlindChatRoutes } from "../module/BlindChat/blindChat.routes";
 import { ChatRoutes } from "../module/Chat/chat.routes";
 import { MessagesRoutes } from "../module/Message/message.routes";
 import { NotificationRoutes } from "../module/Notification/notification.routes";
+import { ProfileRoutes } from "../module/Profile/profile.routes";
 
 const router = Router();
 
@@ -14,6 +15,10 @@ const moduleRoutes = [
   {
     path: "/auth",
     route: AuthRoutes,
+  },
+  {
+    path: "/profile",
+    route: ProfileRoutes,
   },
   {
     path: "/interests",
