@@ -35,16 +35,6 @@ const logout = async (userId: string) => {
   return true;
 };
 
-const getCurrentUser = async (userId: string) => {
-  return await User.findById(userId).select("-password");
-};
-
-const updateProfile = async (userId: string, payload: { name?: string }) => {
-  return await User.findByIdAndUpdate(userId, payload, { new: true }).select(
-    "-password"
-  );
-};
-
 const updatePassword = async (
   userId: string,
   payload: { oldPassword: string; newPassword: string }
@@ -71,8 +61,5 @@ export const AuthService = {
   register,
   login,
   logout,
-  getCurrentUser,
-  updateProfile,
   updatePassword,
-  deleteAccount,
 };

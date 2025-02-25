@@ -46,25 +46,6 @@ const logout = catchAsync(async (req, res) => {
   });
 });
 
-const getCurrentUser = catchAsync(async (req, res) => {
-  const result = await AuthService.getCurrentUser(req.user.id);
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    data: result,
-  });
-});
-
-const updateProfile = catchAsync(async (req, res) => {
-  const result = await AuthService.updateProfile(req.user.id, req.body);
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "Profile updated successfully",
-    data: result,
-  });
-});
-
 const updatePassword = catchAsync(async (req, res) => {
   await AuthService.updatePassword(req.user.id, req.body);
   sendResponse(res, {
@@ -74,21 +55,9 @@ const updatePassword = catchAsync(async (req, res) => {
   });
 });
 
-const deleteAccount = catchAsync(async (req, res) => {
-  await AuthService.deleteAccount(req.user.id);
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "Account deleted successfully",
-  });
-});
-
 export const AuthController = {
   register,
   login,
   logout,
-  getCurrentUser,
-  updateProfile,
   updatePassword,
-  deleteAccount,
 };
