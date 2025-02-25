@@ -1,0 +1,21 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AuthRoutes = void 0;
+const express_1 = __importDefault(require("express"));
+const auth_controller_1 = require("./auth.controller");
+const validateRequest_1 = __importDefault(require("../../middlewares/validateRequest"));
+const auth_validation_1 = require("./auth.validation");
+const auth_1 = __importDefault(require("../../middlewares/auth"));
+const auth_constants_1 = require("./auth.constants");
+const router = express_1.default.Router();
+router.post("/register", (0, validateRequest_1.default)(auth_validation_1.AuthValidation.register), auth_controller_1.AuthController.register);
+router.post("/login", (0, validateRequest_1.default)(auth_validation_1.AuthValidation.login), auth_controller_1.AuthController.login);
+router.post("/logout", (0, auth_1.default)(auth_constants_1.USER_ROLE.admin, auth_constants_1.USER_ROLE.user), auth_controller_1.AuthController.logout);
+router.get("/me", (0, auth_1.default)(auth_constants_1.USER_ROLE.admin, auth_constants_1.USER_ROLE.user), auth_controller_1.AuthController.getCurrentUser);
+router.put("/update-profile", (0, auth_1.default)(auth_constants_1.USER_ROLE.admin, auth_constants_1.USER_ROLE.user), (0, validateRequest_1.default)(auth_validation_1.AuthValidation.updateProfile), auth_controller_1.AuthController.updateProfile);
+router.put("/update-password", (0, auth_1.default)(auth_constants_1.USER_ROLE.admin, auth_constants_1.USER_ROLE.user), (0, validateRequest_1.default)(auth_validation_1.AuthValidation.changePassword), auth_controller_1.AuthController.updatePassword);
+router.delete("/delete-account", (0, auth_1.default)(auth_constants_1.USER_ROLE.admin, auth_constants_1.USER_ROLE.user), auth_controller_1.AuthController.deleteAccount);
+exports.AuthRoutes = router;
