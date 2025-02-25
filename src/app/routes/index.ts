@@ -6,6 +6,7 @@ import { MatchingRoutes } from "../module/Match/match.routes";
 import { BlindChatRoutes } from "../module/BlindChat/blindChat.routes";
 import { ChatRoutes } from "../module/Chat/chat.routes";
 import { MessagesRoutes } from "../module/Message/message.routes";
+import { NotificationRoutes } from "../module/Notification/notification.routes";
 
 const router = Router();
 
@@ -37,6 +38,10 @@ const moduleRoutes = [
   {
     path: "/messages",
     route: MessagesRoutes,
+  },
+  {
+    path: "/notifications",
+    route: NotificationRoutes,
   },
 ];
 
