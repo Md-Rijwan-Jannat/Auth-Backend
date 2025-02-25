@@ -12,9 +12,6 @@ router.get(
   MatchingController.getSuggestedMatches
 );
 
-// Like a profile
-router.post("/like/:userId", Auth(USER_ROLE.user), MatchingController.likeUser);
-
 // Pass on a profile
 router.post("/pass/:userId", Auth(USER_ROLE.user), MatchingController.passUser);
 

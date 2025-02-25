@@ -14,18 +14,6 @@ const getSuggestedMatches = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const likeUser = catchAsync(async (req: Request, res: Response) => {
-  const likedUserId = req.params.userId;
-  const likingUserId = req.user.id; // Assuming the logged-in user ID
-  const match = await MatchingService.likeUser(likingUserId, likedUserId);
-  sendResponse(res, {
-    success: false,
-    statusCode: 200,
-    message: "User liked successfully",
-    data: match,
-  });
-});
-
 const passUser = catchAsync(async (req: Request, res: Response) => {
   const passedUserId = req.params.userId;
   const passingUserId = req.user.id; // Assuming the logged-in user ID
@@ -62,7 +50,6 @@ const unmatchUser = catchAsync(async (req: Request, res: Response) => {
 
 export const MatchingController = {
   getSuggestedMatches,
-  likeUser,
   passUser,
   getUserMatches,
   unmatchUser,

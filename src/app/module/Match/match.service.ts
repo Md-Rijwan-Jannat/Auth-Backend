@@ -49,66 +49,6 @@ const getSuggestedMatches = async (userId: string): Promise<IUser[]> => {
 
   return result;
 };
-
-/**
- * Like a user. If mutual, create a match.
- */
-const likeUser = async (
-  likingUserId: string,
-  likedUserId: string
-): Promise<IMatch | null> => {
-  const session = await startSession();
-  session.startTransaction();
-
-  try {
-    const likingObjectId = new Types.ObjectId(likingUserId);
-    const likedObjectId = new Types.ObjectId(likedUserId);
-
-    // Check if the user already liked this person
-    const existingLike = await Like.findOne({
-      liker: likingObjectId,
-      liked: likedObjectId,
-    }).session(session);
-
-    // If already liked, return null
-    if (existingLike) {
-      await session.abortTransaction();
-      session.endSession();
-      return null;
-    }
-
-    // Check if the reverse like exists
-    const reverseLike = await Like.findOne({
-      liker: likedObjectId,
-      liked: likingObjectId,
-    }).session(session);
-
-    // Create a like entry
-    await Like.create([{ liker: likingObjectId, liked: likedObjectId }], {
-      session,
-    });
-
-    let match = null;
-
-    // If the reverse like exists, create a match
-    if (reverseLike) {
-      match = await Match.create(
-        [{ user1: likingObjectId, user2: likedObjectId, status: "accepted" }],
-        { session }
-      );
-    }
-
-    await session.commitTransaction();
-    session.endSession();
-
-    return match ? match[0] : null;
-  } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
-    throw new Error(`Transaction failed: ${error}`);
-  }
-};
-
 /**
  * Pass a user (ignore for now, no action taken).
  */
@@ -169,7 +109,6 @@ const unmatchUser = async (matchId: string): Promise<IMatch | null> => {
 
 export const MatchingService = {
   getSuggestedMatches,
-  likeUser,
   passUser,
   getUserMatches,
   unmatchUser,
