@@ -1,0 +1,20 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.NotificationRoutes = void 0;
+const express_1 = __importDefault(require("express"));
+const notification_validation_1 = require("./notification.validation");
+const notification_controller_1 = require("./notification.controller");
+const validateRequest_1 = __importDefault(require("../../middlewares/validateRequest"));
+const auth_1 = __importDefault(require("../../middlewares/auth"));
+const auth_constants_1 = require("../Auth/auth.constants");
+const router = express_1.default.Router();
+router.post("/", (0, auth_1.default)(auth_constants_1.USER_ROLE.admin, auth_constants_1.USER_ROLE.user), (0, validateRequest_1.default)(notification_validation_1.NotificationValidation.createNotification), notification_controller_1.NotificationController.createNotification);
+router.get("/", (0, auth_1.default)(auth_constants_1.USER_ROLE.admin, auth_constants_1.USER_ROLE.user), notification_controller_1.NotificationController.getNotifications);
+router.get("/:id", (0, auth_1.default)(auth_constants_1.USER_ROLE.admin, auth_constants_1.USER_ROLE.user), notification_controller_1.NotificationController.getNotificationById);
+router.get("/unread-count/me", (0, auth_1.default)(auth_constants_1.USER_ROLE.admin, auth_constants_1.USER_ROLE.user), notification_controller_1.NotificationController.getUnreadCount);
+router.patch("/:id/read", (0, auth_1.default)(auth_constants_1.USER_ROLE.admin, auth_constants_1.USER_ROLE.user), notification_controller_1.NotificationController.markNotificationAsRead);
+router.delete("/:id", (0, auth_1.default)(auth_constants_1.USER_ROLE.admin, auth_constants_1.USER_ROLE.user), notification_controller_1.NotificationController.deleteNotification);
+exports.NotificationRoutes = router;
