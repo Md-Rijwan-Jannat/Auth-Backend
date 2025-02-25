@@ -5,6 +5,7 @@ import { LikeRoutes } from "../module/Like/like.routes";
 import { MatchingRoutes } from "../module/Match/match.routes";
 import { BlindChatRoutes } from "../module/BlindChat/blindChat.routes";
 import { ChatRoutes } from "../module/Chat/chat.routes";
+import { MessagesRoutes } from "../module/Message/message.routes";
 
 const router = Router();
 
@@ -32,6 +33,10 @@ const moduleRoutes = [
   {
     path: "/chats",
     route: ChatRoutes,
+  },
+  {
+    path: "/messages",
+    route: MessagesRoutes,
   },
 ];
 
