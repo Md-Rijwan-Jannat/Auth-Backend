@@ -1,9 +1,8 @@
-import mongoose, { Schema, Document } from "mongoose";
+// match.interface.ts
+import { Types } from "mongoose";
 
-// Interface for the Match model
-export interface IMatch extends Document {
-  user1: mongoose.Types.ObjectId;
-  user2: mongoose.Types.ObjectId;
-  status: "pending" | "accepted" | "rejected";
-  createdAt: Date;
+export interface IMatch {
+  user1: Types.ObjectId;
+  user2: Types.ObjectId;
+  status: "accepted";
 }

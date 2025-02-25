@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { AuthRoutes } from "../module/Auth/auth.routes";
 import { InterestRoutes } from "../module/Interest/interest.routes";
+import { LikeRoutes } from "../module/Like/like.routes";
+import { MatchingRoutes } from "../module/Match/match.routes";
 
 const router = Router();
 
@@ -12,6 +14,14 @@ const moduleRoutes = [
   {
     path: "/interests",
     route: InterestRoutes,
+  },
+  {
+    path: "/like",
+    route: LikeRoutes,
+  },
+  {
+    path: "/matchings",
+    route: MatchingRoutes,
   },
 ];
 

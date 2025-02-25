@@ -2,62 +2,169 @@ import Match from "./match.model";
 import { IMatch } from "./match.interface";
 import { IUser } from "../Auth/auth.interface";
 import User from "../Auth/auth.model";
+import { Like } from "../Like/like.model";
+import { Types, startSession } from "mongoose";
 
+/**
+ * Get suggested matches based on shared interests, excluding existing matches.
+ */
 const getSuggestedMatches = async (userId: string): Promise<IUser[]> => {
-  // Logic to get suggested matches based on interests
-  // For now, assuming a basic implementation:
-  const user = await User.findById(userId).populate("interests");
-  const suggestedUsers = await User.find({ _id: { $ne: userId } }).populate(
-    "interests"
-  );
+  // Fetch the current user and populate interests
+  const user = await User.findById(userId);
 
-  // Filter users based on some interest matching logic
-  const matches = suggestedUsers.filter((suggestedUser) => {
-    return suggestedUser.interests.some((interest) =>
-      user?.interests.includes(interest)
-    );
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  // Extract user's interest IDs
+  const userInterestIds = user.interests.map((interest) => interest);
+
+  // Get matched users
+  const existingMatches = await Match.find({
+    $or: [{ user1: userId }, { user2: userId }],
   });
 
-  return matches;
+  const matchedUserIds = existingMatches.map((match) =>
+    match.user1.toString() === userId
+      ? match.user2.toString()
+      : match.user1.toString()
+  );
+
+  // Fetch matched users
+  const matchedUsers = await User.find({
+    _id: { $in: matchedUserIds },
+  }).populate("interests");
+
+  // Find suggested users (excluding matched users and the current user)
+  const potentialUsers = await User.find({
+    _id: { $nin: [...matchedUserIds, userId] },
+    interests: { $in: userInterestIds }, // Users with matching interests
+  }).populate("interests");
+
+  // Combine both matched and suggested users into one array
+  const result: IUser[] = [
+    ...potentialUsers.map((user) => user),
+    ...matchedUsers.map((user) => user),
+  ];
+
+  return result;
 };
 
+/**
+ * Like a user. If mutual, create a match.
+ */
 const likeUser = async (
   likingUserId: string,
   likedUserId: string
-): Promise<IMatch> => {
-  // Logic to like a user and create a match if both like each other
-  let match = await Match.findOne({ user1: likingUserId, user2: likedUserId });
+): Promise<IMatch | null> => {
+  const session = await startSession();
+  session.startTransaction();
 
-  if (!match) {
-    match = await Match.create({ user1: likingUserId, user2: likedUserId });
+  try {
+    const likingObjectId = new Types.ObjectId(likingUserId);
+    const likedObjectId = new Types.ObjectId(likedUserId);
+
+    // Check if the user already liked this person
+    const existingLike = await Like.findOne({
+      liker: likingObjectId,
+      liked: likedObjectId,
+    }).session(session);
+
+    // If already liked, return null
+    if (existingLike) {
+      await session.abortTransaction();
+      session.endSession();
+      return null;
+    }
+
+    // Check if the reverse like exists
+    const reverseLike = await Like.findOne({
+      liker: likedObjectId,
+      liked: likingObjectId,
+    }).session(session);
+
+    // Create a like entry
+    await Like.create([{ liker: likingObjectId, liked: likedObjectId }], {
+      session,
+    });
+
+    let match = null;
+
+    // If the reverse like exists, create a match
+    if (reverseLike) {
+      match = await Match.create(
+        [{ user1: likingObjectId, user2: likedObjectId, status: "accepted" }],
+        { session }
+      );
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return match ? match[0] : null;
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw new Error(`Transaction failed: ${error}`);
   }
-
-  // Logic for creating a match if both users like each other can be added here
-
-  return match;
 };
 
+/**
+ * Pass a user (ignore for now, no action taken).
+ */
 const passUser = async (
   passingUserId: string,
   passedUserId: string
 ): Promise<boolean> => {
-  // Logic to handle passing a user (no match)
-  return true;
+  return true; // Placeholder (future logic could blacklist user suggestions)
 };
 
+/**
+ * Get all matches for a user.
+ */
 const getUserMatches = async (userId: string): Promise<IMatch[]> => {
-  // Fetch matches for a user
-  const matches = await Match.find({
+  return Match.find({
     $or: [{ user1: userId }, { user2: userId }],
     status: "accepted",
   });
-  return matches;
 };
 
+/**
+ * Unmatch a user, removing both the match and like records.
+ */
 const unmatchUser = async (matchId: string): Promise<IMatch | null> => {
-  // Unmatch users (delete match)
-  const match = await Match.findByIdAndDelete(matchId);
-  return match;
+  const session = await startSession();
+  session.startTransaction();
+
+  try {
+    const match = await Match.findById(matchId).session(session);
+
+    if (!match) {
+      await session.abortTransaction();
+      session.endSession();
+      return null;
+    }
+
+    // Delete the match
+    await Match.deleteOne({ _id: matchId }).session(session);
+
+    // Remove associated likes
+    await Like.deleteMany({
+      $or: [
+        { liker: match.user1, liked: match.user2 },
+        { liker: match.user2, liked: match.user1 },
+      ],
+    }).session(session);
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return match;
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw new Error(`Transaction failed: ${error}`);
+  }
 };
 
 export const MatchingService = {
